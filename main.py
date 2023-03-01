@@ -2,6 +2,7 @@ from typing import List
 from fastapi import FastAPI, BackgroundTasks
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
+from ml_processing import ml_process_video
 
 
 from sql_app import crud, models, schemas, database
@@ -23,6 +24,19 @@ def get_db():
 async def root():
     return {"message": "Hello World"}
 
+# get all videos
+@app.get("/list")
+async def push_video(db: Session = Depends(get_db)):
+    # put entry into DB with status "queued"
+    videos = crud.get_videos(db)
+    return videos
+
+# get the status of video with id
+@app.get("/status/{video_id}")
+async def push_video(video_id: str, db: Session = Depends(get_db)):
+    video: models.Video = crud.get_video_by_id(db, video_id)
+    return video.status
+
 # endpoint to create new video to be processed
 @app.post("/push")
 async def push_video(video_item: schemas.VideoCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -34,10 +48,15 @@ async def push_video(video_item: schemas.VideoCreate, background_tasks: Backgrou
 
 # processes video and updates database while doing so. Will be called with add_task, must be one atomic action
 # id must be generated before this function
-def process_video(video_to_process: models.Video, db: Session = Depends(get_db)):
-    # assume entry is already in DB. updates status to "processing"
-    crud.update_video_status(db, video_to_process.id, "processing")
+async def process_video(video_to_process: models.Video, db: Session = Depends(get_db)):
+    # 1. updates status to "processing"
+    id = video_to_process.id
+    crud.update_video_status(db, id, "processing")
+
+    # TODO: ML PROCESSING HERE
+    ml_process_video(video_to_process.source_url)
+
 
     # n. update status to "finished"
-    crud.update_video_status(db, video_to_process.id, "finished")
+    crud.update_video_status(db, id, "finished")
     return 0
