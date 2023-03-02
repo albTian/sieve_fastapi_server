@@ -1,6 +1,5 @@
 from typing import List
-from fastapi import FastAPI, BackgroundTasks
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
 from ml_processing import ml_process_video
 import json
