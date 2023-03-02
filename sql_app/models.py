@@ -11,3 +11,4 @@ class Video(Base):
     source_name = Column(String, index=True)
     source_url = Column(String, index=True)
     status = Column(String, index=True)
+    data = Column(String, index=True)

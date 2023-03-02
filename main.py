@@ -3,6 +3,7 @@ from fastapi import FastAPI, BackgroundTasks
 from fastapi import Depends, FastAPI
 from sqlalchemy.orm import Session
 from ml_processing import ml_process_video
+import json
 
 
 from sql_app import crud, models, schemas, database
@@ -35,8 +36,13 @@ async def list_videos(db: Session = Depends(get_db)):
 @app.get("/status/{video_id}")
 async def video_status(video_id: str, db: Session = Depends(get_db)):
     video: models.Video = crud.get_video_by_id(db, video_id)
-    # return f"No video with id: {video_id}" if not video else video.status 
-    return video.status
+    return f"No video with id: {video_id}" if not video else video.status 
+
+# get the data of video with id
+@app.get("/query/{video_id}")
+async def video_status(video_id: str, db: Session = Depends(get_db)):
+    video: models.Video = crud.get_video_by_id(db, video_id)
+    return f"No video with id: {video_id}" if not video else json.loads(video.data)
 
 # endpoint to create new video to be processed
 @app.post("/push")
@@ -56,7 +62,8 @@ def process_video(video_to_process: models.Video, db: Session = Depends(get_db))
 
     # TODO: ML PROCESSING HERE
     # TODO: add data to table here
-    ml_process_video(video_to_process.source_url)
+    ml_data = ml_process_video(video_to_process.source_url)
+    crud.update_video_data(db, id, ml_data)
 
     # n. update status to "finished"
     crud.update_video_status(db, id, "finished")
