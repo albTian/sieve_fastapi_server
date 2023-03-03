@@ -1,11 +1,11 @@
 from typing import List
 from fastapi import FastAPI, BackgroundTasks, Depends
 from sqlalchemy.orm import Session
-from ml_processing import ml_process_video
+from .ml_processing.ml_processing import ml_process_video
 import json
 
 
-from sql_app import crud, models, schemas, database
+from .sql_app import crud, models, schemas, database
 engine, SessionLocal = database.engine, database.SessionLocal
 
 app = FastAPI()

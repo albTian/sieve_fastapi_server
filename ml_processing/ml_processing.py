@@ -1,7 +1,7 @@
 from typing import List, Dict
 import torch
 import cv2
-from sort import Sort
+from ..sort.sort import Sort
 import numpy as np
 import uuid
 
