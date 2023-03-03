@@ -47,6 +47,8 @@ def main():
     refresh = st.button("refresh data")
     if refresh:
         all_data = requests.get(f"{BASE_URL}/list").json()
+        # display in reverse chronological
+        all_data.reverse()
         st.write(all_data)
     # st.table(data.json())
 
