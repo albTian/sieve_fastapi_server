@@ -75,22 +75,29 @@ def sieve_format_results(results, frame_number):
 def ml_process_video(source_url):
     print("running ml processing...")
     cap = cv2.VideoCapture(source_url)
+    fps = int(cap.get(cv2.CAP_PROP_FPS))
 
     yolo_results = []
-    frame_number = 0
+    frame_number, frame_counter = 0, 0
     while(True):
-        # Capture frame-by-frame
         ret, frame = cap.read()
 
         if frame is None:
             print("Finished processing video")
             break
-        
+
+        # process at 1fps so it doesn't take forever lol
+        if frame_counter % fps != 0:
+            frame_counter += 1
+            continue
+
         # rely on AutoShape to fit our frame, format result to our desired shape
         results = model(frame)
         outputs = sieve_format_results(results, frame_number)
         yolo_results.append(outputs)
         frame_number += 1
+        frame_counter += 1
+
 
     sort_results = sieve_sort(yolo_results)
     cap.release()

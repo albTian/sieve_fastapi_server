@@ -41,7 +41,7 @@ async def video_status(video_id: str, db: Session = Depends(get_db)):
 @app.get("/query/{video_id}")
 async def video_status(video_id: str, db: Session = Depends(get_db)):
     video: models.Video = crud.get_video_by_id(db, video_id)
-    return f"No video with id: {video_id}" if not video else json.loads(video.data)
+    return f"No video with id: {video_id}" if not video else json.loads(video.data or "{}")
 
 # endpoint to create new video to be processed
 @app.post("/push")

@@ -5,3 +5,6 @@
 fkey.pem
 fastapi_large_2.pem
 fastapi_tutorial.pem
+space_key.txt
+/deta_dependencies
+/fastapi_env
